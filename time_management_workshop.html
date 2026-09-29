@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Management & Action Plan Lab</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            min-height: 100vh;
+            color: #f8fafc;
+            font-size: 16px;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .glass-card-interactive {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card-interactive:hover {
+            border-color: rgba(99, 102, 241, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .img-card-header {
+            height: 120px;
+            object-fit: cover;
+            width: 100%;
+            border-top-left-radius: 0.75rem;
+            border-top-right-radius: 0.75rem;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+                font-size: 14px !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .glass-card {
+                background: none !important;
+                border: 1px solid #ccc !important;
+                color: black !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- Top Navigation Header -->
+    <header class="w-full border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-50 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="app.goToModule(0)">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+                    <i class="fa-solid fa-hourglass-half text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-xl leading-tight text-white tracking-tight">Time Management Workshop</h1>
+                    <p class="text-xs text-indigo-300">Project Action Plan & Lab</p>
+                </div>
+            </div>
+
+            <!-- Clickable Interactive Progress Tracker -->
+            <div id="nav-progress-container" class="hidden md:flex items-center gap-2 text-sm font-semibold">
+                <button id="step-badge-1" onclick="app.goToModule(1)" class="px-3.5 py-1.5 rounded-full bg-slate-800 text-slate-400 transition-all hover:scale-105 hover:text-white" title="Diagnostic">1. Diagnostic</button>
+                <i class="fa-solid fa-chevron-right text-slate-600 text-xs"></i>
+                <button id="step-badge-2" onclick="app.goToModule(2)" class="px-3.5 py-1.5 rounded-full bg-slate-800 text-slate-400 transition-all hover:scale-105 hover:text-white" title="Scenarios">2. Scenarios</button>
+                <i class="fa-solid fa-chevron-right text-slate-600 text-xs"></i>
+                <button id="step-badge-3" onclick="app.goToModule(3)" class="px-3.5 py-1.5 rounded-full bg-slate-800 text-slate-400 transition-all hover:scale-105 hover:text-white" title="Priorities">3. Priorities</button>
+                <i class="fa-solid fa-chevron-right text-slate-600 text-xs"></i>
+                <button id="step-badge-4" onclick="app.goToModule(4)" class="px-3.5 py-1.5 rounded-full bg-slate-800 text-slate-400 transition-all hover:scale-105 hover:text-white" title="Techniques">4. Techniques</button>
+                <i class="fa-solid fa-chevron-right text-slate-600 text-xs"></i>
+                <button id="step-badge-5" onclick="app.goToModule(5)" class="px-3.5 py-1.5 rounded-full bg-slate-800 text-slate-400 transition-all hover:scale-105 hover:text-white" title="Action Plan">5. Action Plan</button>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button id="reset-current-stage-btn" onclick="app.resetCurrentStage()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-amber-300 border border-amber-500/30 flex items-center gap-2 transition-colors">
+                    <i class="fa-solid fa-rotate"></i>
+                    <span class="hidden sm:inline">Reset Stage</span>
+                </button>
+                <button id="sound-toggle-btn" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors" title="Toggle Sound">
+                    <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-5xl w-full mx-auto px-4 py-8 flex flex-col justify-center">
+
+        <!-- MODULE 0: Intro Screen -->
+        <section id="module-intro" class="w-full">
+            <div class="glass-card rounded-2xl p-8 sm:p-12 text-center relative overflow-hidden shadow-2xl border border-indigo-500/20">
+                <!-- Hero Imagery -->
+                <div class="mb-6 rounded-2xl overflow-hidden border border-slate-700 shadow-xl max-w-2xl mx-auto">
+                    <img src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=1200&q=80" 
+                         alt="Time Management Concept" 
+                         class="w-full h-48 sm:h-56 object-cover"
+                         onerror="this.src='https://placehold.co/1200x400/1e293b/6366f1?text=Time+Management+Workshop+Lab'">
+                </div>
+
+                <h1 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-4 leading-tight">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400">
+                        Time Management Workshop
+                    </span>
+                </h1>
+                
+                <p class="text-slate-200 text-base sm:text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
+                    Identify your time management bottlenecks across <strong>Proposal, Research, Implementation, and Evaluation</strong>, and build your personalized Action Plan.
+                </p>
+
+                <!-- Student Information Form -->
+                <div class="max-w-md mx-auto bg-slate-900/80 p-6 rounded-2xl border border-slate-700 mb-8 text-left space-y-4">
+                    <h3 class="text-base font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-user-pen text-indigo-400"></i> Student Details
+                    </h3>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Student Name</label>
+                        <input type="text" id="student-name" placeholder="e.g. Alex Morgan" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-base text-white focus:outline-none focus:border-indigo-500 transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Project Title / Course</label>
+                        <input type="text" id="student-course" placeholder="e.g. Senior Capstone Project" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-base text-white focus:outline-none focus:border-indigo-500 transition-colors">
+                    </div>
+                </div>
+
+                <button onclick="app.startDiagnostic()" class="px-8 py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-lg shadow-xl shadow-indigo-600/30 transition-all transform hover:scale-[1.02] active:scale-95 inline-flex items-center gap-3">
+                    Start Workshop Lab <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- MODULE 1: Diagnostic Quiz -->
+        <section id="module-diagnostic" class="hidden w-full space-y-6">
+            <div class="glass-card rounded-2xl p-6 sm:p-10">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-700/80 pb-6 mb-6">
+                    <div>
+                        <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Module 1 of 5</span>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3 mt-1">
+                            <i class="fa-solid fa-magnifying-glass-chart text-indigo-400"></i>
+                            Procrastination Diagnostic
+                        </h2>
+                    </div>
+                    <button onclick="app.resetStage(1)" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-amber-300 border border-amber-500/30 flex items-center gap-1.5">
+                        <i class="fa-solid fa-arrows-rotate"></i> Reset Stage
+                    </button>
+                </div>
+
+                <p class="text-slate-200 text-base mb-6">
+                    Rate how strongly each resistance factor impacts your project progress (1 = Minimal, 5 = Severe):
+                </p>
+
+                <!-- Triggers Diagnostic Form -->
+                <div id="triggers-diagnostic-list" class="space-y-3">
+                    <!-- Dynamically populated via JS -->
+                </div>
+
+                <div class="mt-8 flex justify-between items-center border-t border-slate-700/80 pt-6">
+                    <button onclick="app.goToModule(0)" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-pen-to-square"></i> Edit Details
+                    </button>
+                    <button onclick="app.submitDiagnostic()" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-base flex items-center gap-2 shadow-lg shadow-indigo-600/30 transition-all">
+                        Proceed to Scenarios <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 2: Project Phase Scenarios -->
+        <section id="module-triggers-game" class="hidden w-full space-y-6">
+            <div class="glass-card rounded-2xl p-6 sm:p-10">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-700/80 pb-6 mb-6">
+                    <div>
+                        <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Module 2 of 5</span>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3 mt-1">
+                            <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+                            Project Phase Scenarios
+                        </h2>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="app.resetStage(2)" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-amber-300 border border-amber-500/30 flex items-center gap-1.5">
+                            <i class="fa-solid fa-arrows-rotate"></i> Reset Scenarios
+                        </button>
+                        <div class="px-3.5 py-1.5 rounded-xl bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 font-bold text-sm">
+                            Score: <span id="triggers-score">0</span> / 4
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-slate-200 text-base mb-6">
+                    Select the best strategy for each project phase scenario below. <span class="text-amber-300 font-semibold">If an answer turns red, you can choose again!</span>
+                </p>
+
+                <!-- Scenario Cards Grid -->
+                <div id="trigger-scenarios-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Populated dynamically via JS -->
+                </div>
+
+                <div class="mt-8 flex justify-between items-center border-t border-slate-700/80 pt-6">
+                    <button onclick="app.goToModule(1)" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> Diagnostic
+                    </button>
+                    <button id="btn-next-module-2" onclick="app.nextModule(2)" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-base flex items-center gap-2 shadow-lg transition-all opacity-50 cursor-not-allowed" disabled>
+                        Next: Priorities <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 3: Priority Lab (Pickle Jar Theory) -->
+        <section id="module-priorities" class="hidden w-full space-y-6">
+            <div class="glass-card rounded-2xl p-6 sm:p-10">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-700/80 pb-6 mb-6">
+                    <div>
+                        <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Module 3 of 5</span>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3 mt-1">
+                            <i class="fa-solid fa-jar text-amber-400"></i>
+                            Task Prioritisation - Pickle Jar
+                        </h2>
+                    </div>
+                    <button onclick="app.resetStage(3)" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-amber-300 border border-amber-500/30 flex items-center gap-1.5">
+                        <i class="fa-solid fa-arrows-rotate"></i> Reset Tasks
+                    </button>
+                </div>
+
+                <!-- Pickle Jar Visual & Theory Description -->
+                <div class="mb-6 p-5 rounded-2xl bg-slate-900/90 border border-amber-500/30 text-sm text-slate-200 space-y-3">
+                    <div class="flex flex-col sm:flex-row items-center gap-4">
+                        <div class="w-full sm:w-1/3 rounded-xl overflow-hidden border border-amber-500/30 shrink-0 bg-slate-950/80 p-3 flex items-center justify-center">
+                            <svg viewBox="0 0 200 220" class="w-full h-36 max-w-[180px] filter drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Jar Lid -->
+                                <rect x="65" y="10" width="70" height="14" rx="4" fill="#d97706" stroke="#f59e0b" stroke-width="2"/>
+                                <rect x="60" y="22" width="80" height="8" rx="3" fill="#b45309" stroke="#f59e0b" stroke-width="1.5"/>
+                                
+                                <!-- Jar Neck & Body -->
+                                <path d="M 68 30 L 68 42 C 68 48 40 55 40 75 L 40 190 C 40 205 55 210 100 210 C 145 210 160 205 160 190 L 160 75 C 160 55 132 48 132 42 L 132 30 Z" 
+                                      fill="rgba(30, 41, 59, 0.6)" stroke="#38bdf8" stroke-width="2.5" stroke-linejoin="round"/>
+                                
+                                <!-- Sand Layer (Green/Emerald base) -->
+                                <path d="M 43 175 C 60 170 80 178 100 173 C 120 168 140 175 157 172 L 157 190 C 157 202 145 207 100 207 C 55 207 43 202 43 190 Z" 
+                                      fill="#10b981" opacity="0.35"/>
+                                <circle cx="60" cy="188" r="1.5" fill="#34d399"/>
+                                <circle cx="85" cy="195" r="1.5" fill="#34d399"/>
+                                <circle cx="115" cy="185" r="1.5" fill="#34d399"/>
+                                <circle cx="140" cy="192" r="1.5" fill="#34d399"/>
+                                <circle cx="75" cy="180" r="1.5" fill="#34d399"/>
+                                <circle cx="125" cy="198" r="1.5" fill="#34d399"/>
+
+                                <!-- Pebbles (Blue/Slate spheres) -->
+                                <circle cx="65" cy="165" r="9" fill="#3b82f6" opacity="0.85" stroke="#60a5fa" stroke-width="1"/>
+                                <circle cx="83" cy="168" r="8" fill="#2563eb" opacity="0.85" stroke="#60a5fa" stroke-width="1"/>
+                                <circle cx="135" cy="164" r="10" fill="#3b82f6" opacity="0.85" stroke="#60a5fa" stroke-width="1"/>
+                                <circle cx="118" cy="170" r="7" fill="#60a5fa" opacity="0.85" stroke="#93c5fd" stroke-width="1"/>
+                                <circle cx="150" cy="152" r="7" fill="#2563eb" opacity="0.85"/>
+                                <circle cx="50" cy="155" r="8" fill="#3b82f6" opacity="0.85"/>
+
+                                <!-- Rocks (Amber/Gold Gemstone Polygons) -->
+                                <!-- Rock 1 -->
+                                <polygon points="55,140 75,120 100,135 90,155 60,152" fill="#f59e0b" stroke="#fbbf24" stroke-width="1.5"/>
+                                <polygon points="55,140 75,120 78,138 60,152" fill="#d97706" opacity="0.6"/>
+                                <!-- Rock 2 -->
+                                <polygon points="105,125 130,110 152,130 142,150 112,148" fill="#f59e0b" stroke="#fbbf24" stroke-width="1.5"/>
+                                <polygon points="105,125 130,110 128,132 112,148" fill="#b45309" opacity="0.6"/>
+                                <!-- Rock 3 (Center Top Rock) -->
+                                <polygon points="78,110 102,85 125,102 110,122 85,120" fill="#fbbf24" stroke="#fef08a" stroke-width="1.5"/>
+                                <polygon points="78,110 102,85 100,105 85,120" fill="#d97706" opacity="0.5"/>
+
+                                <!-- Jar Pickle Badge Label -->
+                                <rect x="72" y="55" width="56" height="22" rx="4" fill="#064e3b" stroke="#10b981" stroke-width="1.5"/>
+                                <text x="100" y="70" font-family="sans-serif" font-size="9" font-weight="bold" fill="#34d399" text-anchor="middle">PICKLES</text>
+
+                                <!-- Glass Reflections -->
+                                <path d="M 48 80 Q 45 130 52 180" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.3" fill="none"/>
+                                <path d="M 152 85 Q 155 125 150 160" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity="0.15" fill="none"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2 text-amber-400 font-bold text-base mb-1">
+                                <i class="fa-solid fa-lightbulb"></i> The Pickle Jar Theory
+                            </div>
+                            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                                Imagine your available working time as an empty pickle jar. If you fill it with <strong>Sand</strong> (social media, micro-distractions) or <strong>Pebbles</strong> (routine admin tasks) first, you won't leave room for the big <strong>Rocks</strong> (core deliverables & high-impact goals). Prioritise by placing your critical <strong>Rocks</strong> in the jar first, filling around them with <strong>Pebbles</strong>, and allowing <strong>Sand</strong> only in remaining idle spaces.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-slate-200 text-base mb-6">
+                    Tick <strong>Rock</strong>, <strong>Pebble</strong>, or <strong>Sand</strong> for each task below. Tasks will automatically group into their respective category boxes:
+                </p>
+
+                <!-- Selection & Auto-Grouping Workspace -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    
+                    <!-- Task Selection List (Left Side) -->
+                    <div class="lg:col-span-6 bg-slate-900/90 p-5 rounded-2xl border border-slate-700 space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-list-check text-indigo-400"></i> Project Task Items
+                            </h3>
+                            <span id="tasks-status-count" class="text-xs font-semibold text-slate-400">0 / 7 categorized</span>
+                        </div>
+                        
+                        <div id="pickle-tasks-pool" class="space-y-3 min-h-[220px]">
+                            <!-- Dynamic task list with Rock/Pebble/Sand options -->
+                        </div>
+                    </div>
+
+                    <!-- Auto-Grouped Categories (Right Side) -->
+                    <div class="lg:col-span-6 space-y-4">
+                        
+                        <!-- ROCKS GROUP -->
+                        <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 min-h-[100px]">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm font-bold text-amber-300 flex items-center gap-2">
+                                    <i class="fa-solid fa-cubes-stacked"></i> ROCKS (High-Impact Milestones)
+                                </span>
+                                <span id="count-rocks" class="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">0</span>
+                            </div>
+                            <div id="jar-rocks-zone" class="space-y-2 min-h-[40px]">
+                                <!-- Auto grouped Rocks -->
+                            </div>
+                        </div>
+
+                        <!-- PEBBLES GROUP -->
+                        <div class="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/30 min-h-[100px]">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm font-bold text-blue-300 flex items-center gap-2">
+                                    <i class="fa-solid fa-circle-dot"></i> PEBBLES (Secondary Tasks)
+                                </span>
+                                <span id="count-pebbles" class="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/40">0</span>
+                            </div>
+                            <div id="jar-pebbles-zone" class="space-y-2 min-h-[40px]">
+                                <!-- Auto grouped Pebbles -->
+                            </div>
+                        </div>
+
+                        <!-- SAND GROUP -->
+                        <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 min-h-[100px]">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm font-bold text-emerald-300 flex items-center gap-2">
+                                    <i class="fa-solid fa-rug"></i> SAND (Distractions & Chores)
+                                </span>
+                                <span id="count-sand" class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">0</span>
+                            </div>
+                            <div id="jar-sand-zone" class="space-y-2 min-h-[40px]">
+                                <!-- Auto grouped Sand -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-between items-center border-t border-slate-700/80 pt-6">
+                    <button onclick="app.goToModule(2)" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> Scenarios
+                    </button>
+                    <button onclick="app.nextModule(3)" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-base flex items-center gap-2 shadow-lg transition-all">
+                        Next: Techniques <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 4: Time Management Techniques -->
+        <section id="module-tactics" class="hidden w-full space-y-6">
+            <div class="glass-card rounded-2xl p-6 sm:p-10">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-700/80 pb-6 mb-6">
+                    <div>
+                        <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Module 4 of 5</span>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3 mt-1">
+                            <i class="fa-solid fa-toolbox text-purple-400"></i>
+                            Time Management Techniques
+                        </h2>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="app.resetStage(4)" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-amber-300 border border-amber-500/30 flex items-center gap-1.5">
+                            <i class="fa-solid fa-arrows-rotate"></i> Reset Selections
+                        </button>
+                        <div class="px-3.5 py-1.5 rounded-xl bg-purple-500/20 border border-purple-500/40 text-purple-300 font-bold text-sm">
+                            Selected: <span id="selected-tech-count">0</span> / 3
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-slate-200 text-base mb-6">
+                    Choose <strong>up to 3 techniques</strong> that suit your workflow best. Click each technique box to view its definition and image:
+                </p>
+
+                <!-- Techniques Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="techniques-list-container">
+                    <!-- Populated dynamically via JS -->
+                </div>
+
+                <div class="mt-8 flex justify-between items-center border-t border-slate-700/80 pt-6">
+                    <button onclick="app.goToModule(3)" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> Priorities
+                    </button>
+                    <button onclick="app.generateActionPlan()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-base flex items-center gap-2 shadow-lg transition-all">
+                        Generate Action Plan & Reflection <i class="fa-solid fa-file-contract"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 5: Action Plan & Reflection -->
+        <section id="module-report" class="hidden w-full space-y-6">
+            <div class="glass-card rounded-2xl p-6 sm:p-10 text-slate-100 shadow-2xl">
+                
+                <!-- Action Header (No Print) -->
+                <div class="no-print flex flex-wrap justify-between items-center gap-4 border-b border-slate-700/80 pb-6 mb-8">
+                    <div>
+                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Module 5 of 5</span>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-white mt-1">Action Plan & Reflection</h2>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="app.goToModule(1)" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-300 text-xs font-bold flex items-center gap-2 border border-slate-700 transition-colors">
+                            <i class="fa-solid fa-pen-to-square"></i> Edit Inputs
+                        </button>
+                        <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold flex items-center gap-2 border border-slate-700 transition-colors">
+                            <i class="fa-solid fa-print"></i> Print / PDF
+                        </button>
+                        <button onclick="app.copyReportToClipboard()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center gap-2 transition-colors shadow-lg">
+                            <i class="fa-solid fa-copy"></i> Copy Plan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Printable Document Sheet -->
+                <div id="printable-report-sheet" class="space-y-6 bg-slate-900/90 p-6 sm:p-8 rounded-2xl border border-slate-700">
+                    
+                    <!-- Report Header -->
+                    <div class="border-b border-slate-700 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <div>
+                            <h2 class="text-2xl font-bold text-indigo-300 tracking-tight">ACTION PLAN & REFLECTION</h2>
+                            <p class="text-xs text-slate-400">Proposal • Research • Implementation • Evaluation</p>
+                        </div>
+                        <div class="text-left sm:text-right text-xs text-slate-300 font-mono">
+                            <div><strong>Student:</strong> <span id="rpt-name">Alex Morgan</span></div>
+                            <div><strong>Course / Project:</strong> <span id="rpt-course">Undergraduate Capstone</span></div>
+                            <div><strong>Date:</strong> <span id="rpt-date"></span></div>
+                        </div>
+                    </div>
+
+                    <!-- Diagnostic Summary & Selected Techniques Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-5 rounded-xl bg-slate-800/80 border border-slate-700">
+                            <h3 class="text-sm font-bold uppercase text-indigo-400 mb-3 flex items-center justify-between">
+                                <span><i class="fa-solid fa-chart-bar mr-1.5"></i> Diagnostic Summary</span>
+                                <button onclick="app.goToModule(1)" class="no-print text-xs text-indigo-300 hover:underline">Edit</button>
+                            </h3>
+                            <ul id="rpt-top-triggers" class="text-sm space-y-2 text-slate-200">
+                                <!-- Dynamic -->
+                            </ul>
+                        </div>
+
+                        <div class="p-5 rounded-xl bg-slate-800/80 border border-slate-700">
+                            <h3 class="text-sm font-bold uppercase text-emerald-400 mb-3 flex items-center justify-between">
+                                <span><i class="fa-solid fa-wrench mr-1.5"></i> Selected Techniques (Max 3)</span>
+                                <button onclick="app.goToModule(4)" class="no-print text-xs text-emerald-300 hover:underline">Edit</button>
+                            </h3>
+                            <ul id="rpt-selected-tools" class="text-sm space-y-2 text-slate-200">
+                                <!-- Dynamic -->
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Reflection Questions Section -->
+                    <div class="space-y-6 border-t border-slate-700/80 pt-6">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                            <h3 class="text-base font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-pen-to-square text-amber-400"></i> Student Reflections
+                            </h3>
+                            <button type="button" onclick="app.copyReflectionsOnly()" class="no-print px-3 py-1.5 rounded-xl bg-indigo-600/80 hover:bg-indigo-600 text-xs font-semibold text-white border border-indigo-400/40 flex items-center gap-1.5 transition-all">
+                                <i class="fa-solid fa-copy"></i> Copy All Reflections
+                            </button>
+                        </div>
+
+                        <!-- QUESTION 1 -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center gap-2">
+                                <label class="block text-sm font-bold text-slate-200">
+                                    1. Identify your project's high-priority "Rocks" (e.g., Proposal submission, core implementation) vs "Sand" distractions (e.g., tweaking formatting, social media):
+                                </label>
+                                <button type="button" onclick="app.copySingleField('reflect-q1', 'Question 1 Reflection')" class="no-print text-xs text-indigo-300 hover:text-indigo-200 shrink-0 font-semibold flex items-center gap-1">
+                                    <i class="fa-regular fa-copy"></i> Copy
+                                </button>
+                            </div>
+                            <textarea id="reflect-q1" rows="3" placeholder="e.g. Rocks: Complete code evaluation, write section 3. Sand: Rearranging folder structures, changing editor color schemes..." class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors leading-relaxed"></textarea>
+                        </div>
+
+                        <!-- QUESTION 2 -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center gap-2">
+                                <label class="block text-sm font-bold text-slate-200">
+                                    2. Which specific tasks are you currently experiencing the most delay with, and why?
+                                </label>
+                                <button type="button" onclick="app.copySingleField('reflect-q2', 'Question 2 Reflection')" class="no-print text-xs text-indigo-300 hover:text-indigo-200 shrink-0 font-semibold flex items-center gap-1">
+                                    <i class="fa-regular fa-copy"></i> Copy
+                                </button>
+                            </div>
+                            <textarea id="reflect-q2" rows="3" placeholder="e.g. Synthesizing 20 research papers for the literature review is experiencing delay because..." class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors leading-relaxed"></textarea>
+                        </div>
+
+                        <!-- QUESTION 3 -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center gap-2">
+                                <label class="block text-sm font-bold text-slate-200">
+                                    3. How will you apply your selected time management techniques to break down your next key project milestone?
+                                </label>
+                                <button type="button" onclick="app.copySingleField('reflect-q3', 'Question 3 Reflection')" class="no-print text-xs text-indigo-300 hover:text-indigo-200 shrink-0 font-semibold flex items-center gap-1">
+                                    <i class="fa-regular fa-copy"></i> Copy
+                                </button>
+                            </div>
+                            <textarea id="reflect-q3" rows="3" placeholder="e.g. I will use 25-minute Pomodoro sprints to write the Literature Review draft every morning..." class="w-full bg-slate-800 border border-slate-700 rounded-xl p-3.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors leading-relaxed"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="no-print mt-8 flex justify-between items-center border-t border-slate-700/80 pt-6">
+                    <button onclick="app.goToModule(4)" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> Techniques
+                    </button>
+                    <button onclick="app.resetGame()" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-sm transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> Restart Workshop
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Custom Notification Toast -->
+    <div id="toast-notification" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="px-5 py-3.5 rounded-xl bg-indigo-600 text-white font-semibold text-sm shadow-2xl flex items-center gap-3 border border-indigo-400">
+            <i id="toast-icon" class="fa-solid fa-circle-check"></i>
+            <span id="toast-message">Message here</span>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Engine -->
+    <script>
+        // Sound Synthesizer Engine with autoplay resume guard
+        const sounds = {
+            enabled: true,
+            ctx: null,
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) this.ctx = new AudioCtx();
+                }
+            },
+            playTone(freq, duration, type = 'sine') {
+                if (!this.enabled) return;
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+                    if (this.ctx.state === 'suspended') {
+                        this.ctx.resume();
+                    }
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch (e) {
+                    // Ignore audio context autoplay restriction warnings
+                }
+            },
+            playClick() { this.playTone(600, 0.05); },
+            playSuccess() { this.playTone(800, 0.15); },
+            playError() { this.playTone(250, 0.2, 'sawtooth'); }
+        };
+
+        // Procrastination Diagnostic Triggers Data
+        const TRIGGERS_DATA = [
+            { id: 't_unclear', label: 'Ambiguous Scope / Unclear Objectives', icon: 'fa-circle-question' },
+            { id: 't_overwhelm', label: 'Overwhelming Task Size / Dense Content', icon: 'fa-layer-group' },
+            { id: 't_perfection', label: 'Perfectionism / Fear of Failure', icon: 'fa-bullseye' },
+            { id: 't_distraction', label: 'Frequent Digital Distractions', icon: 'fa-mobile-screen' },
+            { id: 't_fatigue', label: 'Low Energy / Mental Burnout', icon: 'fa-battery-quarter' },
+            { id: 't_no_deadline', label: 'Lack of Milestones / Distant Deadlines', icon: 'fa-calendar-xmark' },
+            { id: 't_skill_gap', label: 'Technical / Skill Gap Hesitation', icon: 'fa-code' }
+        ];
+
+        // Pickle Jar Task Items
+        const PICKLE_TASKS = [
+            { id: 't1', name: 'Submit Project Proposal & Core Scope' },
+            { id: 't2', name: 'Deliverable Implementation & Core Analysis' },
+            { id: 't3', name: 'Synthesize Literature Review & Key Insights' },
+            { id: 't4', name: 'Execute Benchmark Evaluation Tests' },
+            { id: 't5', name: 'Format Reference Citations & Bibliography' },
+            { id: 't6', name: 'Organize Project Folders & Files' },
+            { id: 't7', name: 'Checking Messages & Social Media' }
+        ];
+
+        // Generic Project Phase Scenarios with Images
+        const TRIGGER_SCENARIOS = [
+            {
+                id: 'scen-1',
+                stage: 'Proposal Phase',
+                img: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&q=80',
+                problem: 'You face an ambiguous project scope with unclear boundaries.',
+                options: [
+                    { text: 'Delay starting until external instructions become completely clear.', correct: false, feedback: 'Incorrect: Waiting increases time pressure. Try another choice!' },
+                    { text: 'Draft specific sub-questions and scope boundaries, then confirm them with your advisor.', correct: true, feedback: 'Correct! Defining explicit scope boundaries resolves ambiguity early.' }
+                ]
+            },
+            {
+                id: 'scen-2',
+                stage: 'Research Phase',
+                img: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=600&q=80',
+                problem: 'You are confronted with a high volume of dense literature to review.',
+                options: [
+                    { text: 'Break the reading into timed, structured focus blocks with clear notes.', correct: true, feedback: 'Correct! Chunking dense reading maintains steady progress.' },
+                    { text: 'Attempt to read everything in one unbroken multi-hour session.', correct: false, feedback: 'Incorrect: Prolonged sessions cause quick fatigue. Try another choice!' }
+                ]
+            },
+            {
+                id: 'scen-3',
+                stage: 'Implementation Phase',
+                img: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=600&q=80',
+                problem: 'You experience difficulty with using a designing tool for your project layout.',
+                options: [
+                    { text: 'Avoid the designing tool and procrastinate by tweaking minor text fonts or file names endlessly.', correct: false, feedback: 'Incorrect: Avoiding the design bottleneck creates project delay. Try another choice!' },
+                    { text: 'Watch a concise 5-minute step-by-step tutorial or simplify the design into basic wireframe blocks first.', correct: true, feedback: 'Correct! Watching targeted tool tutorials or breaking complex UI layouts into basic wireframes builds confidence.' }
+                ]
+            },
+            {
+                id: 'scen-4',
+                stage: 'Evaluation Phase',
+                img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80',
+                problem: 'You have a distant final deadline with no intermediate sub-deadlines.',
+                options: [
+                    { text: 'Create weekly self-imposed milestones and visual tracking cards.', correct: true, feedback: 'Correct! Intermediate milestones keep progress steady.' },
+                    { text: 'Rely on memory and defer writing until the final week before submission.', correct: false, feedback: 'Incorrect: Last-minute rushes lead to high error rates. Try another choice!' }
+                ]
+            }
+        ];
+
+        // Time Management Techniques with Visual Images
+        const TECHNIQUES_DATA = [
+            {
+                id: 'tech-frog',
+                title: '1. "Eat That Frog" First',
+                icon: 'fa-frog',
+                color: 'text-emerald-400',
+                img: 'https://images.unsplash.com/photo-1538100591399-2911f93f66c9?auto=format&fit=crop&w=600&q=80',
+                definition: 'Tackle your single hardest or most critical project task first thing in your work session before tackling easier items.'
+            },
+            {
+                id: 'tech-pomo',
+                title: '2. Pomodoro Focus Sprints',
+                icon: 'fa-stopwatch',
+                color: 'text-red-400',
+                img: 'https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&w=600&q=80',
+                definition: 'Work in 25-minute uninterrupted focus blocks followed by 5-minute restorative breaks to maintain mental energy.'
+            },
+            {
+                id: 'tech-bpt',
+                title: '3. Biological Prime Time',
+                icon: 'fa-sun',
+                color: 'text-amber-400',
+                img: 'https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?auto=format&fit=crop&w=600&q=80',
+                definition: 'Schedule complex technical tasks during your personal peak energy hours of the day.'
+            },
+            {
+                id: 'tech-kanban',
+                title: '4. Project Kanban Board',
+                icon: 'fa-table-columns',
+                color: 'text-blue-400',
+                img: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?auto=format&fit=crop&w=600&q=80',
+                definition: 'Visualize your project deliverables using To-Do, In-Progress, and Completed columns to maintain momentum.'
+            },
+            {
+                id: 'tech-idid',
+                title: '5. "I-Did" Progress Log',
+                icon: 'fa-list-check',
+                color: 'text-indigo-400',
+                img: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=600&q=80',
+                definition: 'Keep a daily log of micro-accomplishments to build continuous motivation during long projects.'
+            },
+            {
+                id: 'tech-deep',
+                title: '6. Deep Work Protocol',
+                icon: 'fa-plane',
+                color: 'text-pink-400',
+                img: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80',
+                definition: 'Mute notifications and block social media distractions during high-cognitive project work sessions.'
+            }
+        ];
+
+        class TimeManagementApp {
+            constructor() {
+                this.currentModule = 0;
+                this.studentInfo = { name: '', course: '' };
+                this.diagnosticRatings = {};
+                this.topTriggers = [];
+                this.triggerScore = 0;
+                this.scenarioCompleted = [false, false, false, false];
+                this.selectedTechniques = [];
+                this.expandedTechniques = new Set();
+                this.assignedTasks = {}; // taskId -> category ('rocks', 'pebbles', 'sand')
+            }
+
+            init() {
+                this.renderDiagnosticForm();
+                this.renderTriggerScenarios();
+                this.renderPickleTasks();
+                this.renderTechniquesList();
+
+                // Sound toggle listener
+                const soundBtn = document.getElementById('sound-toggle-btn');
+                if (soundBtn) {
+                    soundBtn.addEventListener('click', () => {
+                        sounds.enabled = !sounds.enabled;
+                        const icon = document.getElementById('sound-icon');
+                        if (icon) {
+                            icon.className = sounds.enabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark text-slate-500';
+                        }
+                        this.showToast(sounds.enabled ? 'Sound On' : 'Sound Muted');
+                    });
+                }
+            }
+
+            getStudentDetails() {
+                const name = document.getElementById('student-name')?.value.trim() || 'Alex Morgan';
+                const course = document.getElementById('student-course')?.value.trim() || 'Senior Capstone Project';
+                return { name, course };
+            }
+
+            goToModule(modNum) {
+                sounds.playClick();
+                this.currentModule = modNum;
+                const modules = ['module-intro', 'module-diagnostic', 'module-triggers-game', 'module-priorities', 'module-tactics', 'module-report'];
+                
+                modules.forEach((modId, idx) => {
+                    const el = document.getElementById(modId);
+                    if (el) {
+                        if (idx === modNum) {
+                            el.classList.remove('hidden');
+                        } else {
+                            el.classList.add('hidden');
+                        }
+                    }
+                });
+
+                if (modNum === 3) {
+                    this.renderPickleTasks();
+                } else if (modNum === 4) {
+                    this.renderTechniquesList();
+                    this.updateTechniqueCount();
+                }
+
+                // Update Navigation Badges
+                for (let i = 1; i <= 5; i++) {
+                    const badge = document.getElementById(`step-badge-${i}`);
+                    if (badge) {
+                        if (i === modNum) {
+                            badge.className = 'px-3.5 py-1.5 rounded-full bg-indigo-600 text-white font-bold transition-all hover:scale-105 shadow-md shadow-indigo-600/30';
+                        } else if (i < modNum) {
+                            badge.className = 'px-3.5 py-1.5 rounded-full bg-emerald-900/60 text-emerald-300 border border-emerald-500/30 font-semibold transition-all hover:scale-105';
+                        } else {
+                            badge.className = 'px-3.5 py-1.5 rounded-full bg-slate-800 text-slate-400 font-semibold transition-all hover:scale-105 hover:text-white';
+                        }
+                    }
+                }
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            startDiagnostic() {
+                sounds.playClick();
+                this.studentInfo = this.getStudentDetails();
+                this.goToModule(1);
+            }
+
+            resetCurrentStage() {
+                this.resetStage(this.currentModule);
+            }
+
+            resetStage(stageNum) {
+                sounds.playClick();
+                if (stageNum === 1) {
+                    this.diagnosticRatings = {};
+                    this.renderDiagnosticForm();
+                    this.showToast('Diagnostic cleared');
+                } else if (stageNum === 2) {
+                    this.triggerScore = 0;
+                    this.scenarioCompleted = [false, false, false, false];
+                    const scoreEl = document.getElementById('triggers-score');
+                    if (scoreEl) scoreEl.innerText = '0';
+                    this.renderTriggerScenarios();
+                    const nextBtn = document.getElementById('btn-next-module-2');
+                    if (nextBtn) {
+                        nextBtn.disabled = true;
+                        nextBtn.className = 'px-6 py-3 rounded-xl bg-indigo-600 text-white font-bold text-base flex items-center gap-2 transition-all opacity-50 cursor-not-allowed';
+                    }
+                    this.showToast('Scenarios reset');
+                } else if (stageNum === 3) {
+                    this.assignedTasks = {};
+                    this.renderPickleTasks();
+                    this.showToast('Tasks reset');
+                } else if (stageNum === 4) {
+                    this.selectedTechniques = [];
+                    this.renderTechniquesList();
+                    this.updateTechniqueCount();
+                    this.showToast('Techniques reset');
+                } else if (stageNum === 5) {
+                    const q1 = document.getElementById('reflect-q1');
+                    const q2 = document.getElementById('reflect-q2');
+                    const q3 = document.getElementById('reflect-q3');
+                    if (q1) q1.value = '';
+                    if (q2) q2.value = '';
+                    if (q3) q3.value = '';
+                    this.showToast('Reflections cleared');
+                }
+            }
+
+            /* MODULE 1 DIAGNOSTIC */
+            renderDiagnosticForm() {
+                const container = document.getElementById('triggers-diagnostic-list');
+                if (!container) return;
+                container.innerHTML = TRIGGERS_DATA.map(trig => `
+                    <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-700/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-center gap-3.5">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-lg shrink-0">
+                                <i class="fa-solid ${trig.icon}"></i>
+                            </div>
+                            <h4 class="font-bold text-white text-base">${trig.label}</h4>
+                        </div>
+
+                        <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                            <span class="text-xs text-slate-400 mr-1 font-semibold">Low</span>
+                            ${[1, 2, 3, 4, 5].map(rating => `
+                                <button type="button" 
+                                    onclick="app.setRating('${trig.id}', ${rating}, this)"
+                                    class="trig-btn-${trig.id} w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-sm font-bold transition-all">
+                                    ${rating}
+                                </button>
+                            `).join('')}
+                            <span class="text-xs text-slate-400 ml-1 font-semibold">High</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            setRating(trigId, rating, btn) {
+                sounds.playClick();
+                this.diagnosticRatings[trigId] = rating;
+
+                const siblings = document.querySelectorAll(`.trig-btn-${trigId}`);
+                siblings.forEach(b => {
+                    b.className = `trig-btn-${trigId} w-9 h-9 rounded-xl bg-slate-800 border border-slate-700 text-slate-200 text-sm font-bold transition-all`;
+                });
+
+                btn.className = `trig-btn-${trigId} w-9 h-9 rounded-xl bg-indigo-600 border border-indigo-400 text-white text-sm font-bold shadow-md transition-all scale-105`;
+            }
+
+            submitDiagnostic() {
+                if (Object.keys(this.diagnosticRatings).length < 7) {
+                    this.showToast('Please rate all 7 factors!', 'fa-triangle-exclamation');
+                    return;
+                }
+
+                sounds.playSuccess();
+                const sorted = Object.entries(this.diagnosticRatings)
+                    .map(([id, score]) => ({ ...TRIGGERS_DATA.find(t => t.id === id), score }))
+                    .sort((a, b) => b.score - a.score);
+
+                this.topTriggers = sorted.slice(0, 3);
+                this.goToModule(2);
+            }
+
+            /* MODULE 2 SCENARIOS */
+            renderTriggerScenarios() {
+                const container = document.getElementById('trigger-scenarios-container');
+                if (!container) return;
+                container.innerHTML = TRIGGER_SCENARIOS.map((scen, idx) => `
+                    <div id="scen-card-${idx}" class="p-5 rounded-2xl bg-slate-900/80 border border-slate-700/80 flex flex-col justify-between space-y-4 overflow-hidden">
+                        <div>
+                            <div class="rounded-xl overflow-hidden mb-3 border border-slate-700/80">
+                                <img src="${scen.img}" alt="${scen.stage}" class="w-full h-32 object-cover" onerror="this.src='https://placehold.co/600x300/1e293b/6366f1?text=${scen.stage}'">
+                            </div>
+                            <span class="px-3 py-1 rounded-md bg-purple-500/20 text-purple-300 text-xs font-bold uppercase tracking-wide">
+                                ${scen.stage}
+                            </span>
+                            <p class="text-base text-white font-semibold mt-2 leading-snug">${scen.problem}</p>
+                        </div>
+
+                        <div class="space-y-2.5">
+                            ${scen.options.map((opt, optIdx) => `
+                                <button onclick="app.answerScenario(${idx}, ${optIdx}, this)"
+                                    class="scen-opt-btn-${idx} w-full text-left p-3.5 rounded-xl bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-sm text-slate-200 font-medium transition-all leading-relaxed">
+                                    ${opt.text}
+                                </button>
+                            `).join('')}
+                        </div>
+                        <div id="scen-feedback-${idx}" class="hidden text-xs font-semibold p-3 rounded-xl"></div>
+                    </div>
+                `).join('');
+            }
+
+            answerScenario(scenIdx, optIdx, btn) {
+                const scen = TRIGGER_SCENARIOS[scenIdx];
+                if (!scen) return;
+                const opt = scen.options[optIdx];
+                if (!opt) return;
+
+                const feedbackDiv = document.getElementById(`scen-feedback-${scenIdx}`);
+
+                if (opt.correct) {
+                    sounds.playSuccess();
+                    btn.className = "w-full text-left p-3.5 rounded-xl bg-emerald-900/50 border-2 border-emerald-500 text-sm text-emerald-100 font-bold shadow-lg";
+                    if (feedbackDiv) {
+                        feedbackDiv.className = "text-xs font-semibold p-3 rounded-xl bg-emerald-950/80 text-emerald-300 border border-emerald-800";
+                        feedbackDiv.innerText = opt.feedback;
+                        feedbackDiv.classList.remove('hidden');
+                    }
+
+                    if (!this.scenarioCompleted[scenIdx]) {
+                        this.scenarioCompleted[scenIdx] = true;
+                        this.triggerScore += 1;
+                        const scoreEl = document.getElementById('triggers-score');
+                        if (scoreEl) scoreEl.innerText = this.triggerScore;
+                    }
+
+                    const options = document.querySelectorAll(`.scen-opt-btn-${scenIdx}`);
+                    options.forEach(b => b.disabled = true);
+
+                    if (this.scenarioCompleted.every(c => c === true)) {
+                        const nextBtn = document.getElementById('btn-next-module-2');
+                        if (nextBtn) {
+                            nextBtn.disabled = false;
+                            nextBtn.className = 'px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-base flex items-center gap-2 shadow-lg transition-all animate-bounce';
+                        }
+                        this.showToast('All Scenarios completed! Click Next: Priorities', 'fa-circle-check');
+                    }
+                } else {
+                    sounds.playError();
+                    btn.className = "w-full text-left p-3.5 rounded-xl bg-red-900/40 border-2 border-red-500 text-sm text-red-200 font-semibold";
+                    if (feedbackDiv) {
+                        feedbackDiv.className = "text-xs font-semibold p-3 rounded-xl bg-red-950/80 text-red-300 border border-red-800";
+                        feedbackDiv.innerText = opt.feedback;
+                        feedbackDiv.classList.remove('hidden');
+                    }
+                }
+            }
+
+            /* MODULE 3 PICKLE JAR */
+            renderPickleTasks() {
+                const pool = document.getElementById('pickle-tasks-pool');
+                const totalCategorized = Object.keys(this.assignedTasks).length;
+                
+                const countEl = document.getElementById('tasks-status-count');
+                if (countEl) countEl.innerText = `${totalCategorized} / ${PICKLE_TASKS.length} categorized`;
+
+                if (!pool) return;
+
+                pool.innerHTML = PICKLE_TASKS.map(task => {
+                    const currentCategory = this.assignedTasks[task.id] || '';
+                    return `
+                        <div class="p-3.5 rounded-xl bg-slate-800 border border-slate-700/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all">
+                            <span class="text-sm text-slate-100 font-semibold leading-snug">
+                                ${task.name}
+                            </span>
+                            
+                            <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center bg-slate-900/80 p-1 rounded-xl border border-slate-700">
+                                <button type="button" onclick="app.setTaskCategory('${task.id}', 'rocks')" 
+                                    class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${currentCategory === 'rocks' ? 'bg-amber-500 text-slate-950 shadow-md scale-105' : 'text-amber-400 hover:bg-amber-500/20'}">
+                                    Rock
+                                </button>
+                                <button type="button" onclick="app.setTaskCategory('${task.id}', 'pebbles')" 
+                                    class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${currentCategory === 'pebbles' ? 'bg-blue-500 text-white shadow-md scale-105' : 'text-blue-400 hover:bg-blue-500/20'}">
+                                    Pebble
+                                </button>
+                                <button type="button" onclick="app.setTaskCategory('${task.id}', 'sand')" 
+                                    class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${currentCategory === 'sand' ? 'bg-emerald-500 text-slate-950 shadow-md scale-105' : 'text-emerald-400 hover:bg-emerald-500/20'}">
+                                    Sand
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                this.updateGroupedCategories();
+            }
+
+            setTaskCategory(taskId, category) {
+                sounds.playSuccess();
+                this.assignedTasks[taskId] = category;
+                this.renderPickleTasks();
+            }
+
+            updateGroupedCategories() {
+                const categories = ['rocks', 'pebbles', 'sand'];
+                
+                categories.forEach(cat => {
+                    const zone = document.getElementById(`jar-${cat}-zone`);
+                    const countBadge = document.getElementById(`count-${cat}`);
+                    const tasksInCat = PICKLE_TASKS.filter(t => this.assignedTasks[t.id] === cat);
+                    
+                    if (countBadge) countBadge.innerText = tasksInCat.length;
+
+                    if (zone) {
+                        if (tasksInCat.length === 0) {
+                            zone.innerHTML = `<div class="text-xs text-slate-500 italic p-2">No tasks ticked as ${cat} yet.</div>`;
+                        } else {
+                            zone.innerHTML = tasksInCat.map(t => `
+                                <div class="px-3 py-2 rounded-xl bg-slate-800/90 border border-slate-700 text-xs text-slate-200 font-semibold flex items-center justify-between gap-2 shadow-sm">
+                                    <span>${t.name}</span>
+                                    <button onclick="app.clearTaskCategory('${t.id}')" title="Remove" class="text-slate-400 hover:text-red-400 shrink-0 ml-1">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
+                            `).join('');
+                        }
+                    }
+                });
+            }
+
+            clearTaskCategory(taskId) {
+                sounds.playClick();
+                delete this.assignedTasks[taskId];
+                this.renderPickleTasks();
+            }
+
+            /* MODULE 4 TECHNIQUES */
+            renderTechniquesList() {
+                const container = document.getElementById('techniques-list-container');
+                if (!container) return;
+                container.innerHTML = TECHNIQUES_DATA.map(tech => {
+                    const isSelected = this.selectedTechniques.includes(tech.id);
+                    const isExpanded = this.expandedTechniques.has(tech.id);
+                    return `
+                        <div id="tech-card-${tech.id}" class="rounded-2xl border transition-all ${isSelected ? 'border-indigo-500 bg-indigo-950/40 shadow-lg' : 'border-slate-700 bg-slate-900/80'} overflow-hidden flex flex-col justify-between">
+                            <div>
+                                <div class="relative cursor-pointer overflow-hidden" onclick="app.toggleTechniqueAccordion('${tech.id}')">
+                                    <img src="${tech.img}" alt="${tech.title}" class="img-card-header" onerror="this.src='https://placehold.co/600x300/1e293b/6366f1?text=${tech.title}'">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+                                    
+                                    <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between">
+                                        <div class="flex items-center gap-2.5">
+                                            <div class="w-8 h-8 rounded-lg bg-slate-900/90 border border-slate-700 ${tech.color} flex items-center justify-center text-sm">
+                                                <i class="fa-solid ${tech.icon}"></i>
+                                            </div>
+                                            <h3 class="text-sm font-bold text-white drop-shadow">${tech.title}</h3>
+                                        </div>
+                                        <i id="tech-chevron-${tech.id}" class="fa-solid fa-chevron-down text-slate-300 transition-transform ${isExpanded ? 'rotate-180' : ''}"></i>
+                                    </div>
+                                </div>
+
+                                <div id="tech-def-${tech.id}" class="${isExpanded ? '' : 'hidden'} px-4 py-3 text-xs text-slate-300 bg-slate-950/50 leading-relaxed border-t border-slate-800">
+                                    <p><strong class="text-white">Definition & Strategy:</strong> ${tech.definition}</p>
+                                </div>
+                            </div>
+
+                            <div class="p-3 bg-slate-900/90 border-t border-slate-800/80 flex justify-end">
+                                <button type="button" onclick="app.toggleTechniqueSelection('${tech.id}')" 
+                                    class="px-4 py-2 rounded-xl text-xs font-bold border transition-all ${isSelected ? 'bg-emerald-600 text-white border-emerald-400 shadow-md' : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'}">
+                                    <i class="fa-solid ${isSelected ? 'fa-check' : 'fa-plus'} mr-1"></i> ${isSelected ? 'Selected' : 'Select Technique'}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            toggleTechniqueAccordion(techId) {
+                sounds.playClick();
+                if (this.expandedTechniques.has(techId)) {
+                    this.expandedTechniques.delete(techId);
+                } else {
+                    this.expandedTechniques.add(techId);
+                }
+                
+                const defDiv = document.getElementById(`tech-def-${techId}`);
+                const chevron = document.getElementById(`tech-chevron-${techId}`);
+
+                if (defDiv && chevron) {
+                    if (defDiv.classList.contains('hidden')) {
+                        defDiv.classList.remove('hidden');
+                        chevron.classList.add('rotate-180');
+                    } else {
+                        defDiv.classList.add('hidden');
+                        chevron.classList.remove('rotate-180');
+                    }
+                }
+            }
+
+            toggleTechniqueSelection(techId) {
+                sounds.playClick();
+                const idx = this.selectedTechniques.indexOf(techId);
+
+                if (idx > -1) {
+                    this.selectedTechniques.splice(idx, 1);
+                } else {
+                    if (this.selectedTechniques.length >= 3) {
+                        this.showToast('You can choose up to 3 techniques maximum!', 'fa-triangle-exclamation');
+                        return;
+                    }
+                    this.selectedTechniques.push(techId);
+                }
+
+                this.updateTechniqueCount();
+                this.renderTechniquesList();
+            }
+
+            updateTechniqueCount() {
+                const el = document.getElementById('selected-tech-count');
+                if (el) el.innerText = this.selectedTechniques.length;
+            }
+
+            /* MODULE 5 ACTION PLAN & REFLECTION */
+            generateActionPlan() {
+                sounds.playSuccess();
+
+                const details = this.getStudentDetails();
+                const rptName = document.getElementById('rpt-name');
+                const rptCourse = document.getElementById('rpt-course');
+                const rptDate = document.getElementById('rpt-date');
+
+                if (rptName) rptName.innerText = details.name;
+                if (rptCourse) rptCourse.innerText = details.course;
+                if (rptDate) rptDate.innerText = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+                const topTriggersUl = document.getElementById('rpt-top-triggers');
+                if (topTriggersUl) {
+                    if (this.topTriggers.length > 0) {
+                        topTriggersUl.innerHTML = this.topTriggers.map(t => `
+                            <li class="flex items-center justify-between border-b border-slate-700/50 pb-1.5">
+                                <span class="font-bold text-amber-300"><i class="fa-solid ${t.icon} mr-2"></i> ${t.label}</span>
+                                <span class="text-xs text-slate-400 font-semibold">Severity: ${t.score}/5</span>
+                            </li>
+                        `).join('');
+                    } else {
+                        topTriggersUl.innerHTML = '<li class="text-slate-400">Complete Module 1 to diagnose resistance factors.</li>';
+                    }
+                }
+
+                const toolsUl = document.getElementById('rpt-selected-tools');
+                if (toolsUl) {
+                    if (this.selectedTechniques.length > 0) {
+                        toolsUl.innerHTML = this.selectedTechniques.map(tId => {
+                            const tech = TECHNIQUES_DATA.find(item => item.id === tId);
+                            return `
+                                <li class="flex items-center gap-2">
+                                    <i class="fa-solid fa-check text-emerald-400 text-xs"></i>
+                                    <span class="font-bold text-white">${tech ? tech.title : tId}</span>
+                                </li>
+                            `;
+                        }).join('');
+                    } else {
+                        toolsUl.innerHTML = '<li class="text-slate-400">No techniques selected (Up to 3).</li>';
+                    }
+                }
+
+                this.goToModule(5);
+            }
+
+            copySingleField(fieldId, labelName) {
+                sounds.playClick();
+                const text = document.getElementById(fieldId)?.value;
+                if (!text || text.trim() === '') {
+                    this.showToast(`Please enter content for ${labelName} first!`, 'fa-triangle-exclamation');
+                    return;
+                }
+                this.executeClipboardCopy(text, `${labelName} copied!`);
+            }
+
+            copyReflectionsOnly() {
+                sounds.playClick();
+                const q1 = document.getElementById('reflect-q1')?.value || '';
+                const q2 = document.getElementById('reflect-q2')?.value || '';
+                const q3 = document.getElementById('reflect-q3')?.value || '';
+
+                if (!q1 && !q2 && !q3) {
+                    this.showToast('No reflections written yet!', 'fa-triangle-exclamation');
+                    return;
+                }
+
+                const reflectionsText = `STUDENT REFLECTIONS
+==================================================
+1. High-Priority Rocks vs Sand Distractions:
+${q1 || 'N/A'}
+
+2. Delayed Tasks & Reasons:
+${q2 || 'N/A'}
+
+3. Applying Selected Time Management Techniques:
+${q3 || 'N/A'}
+`;
+                this.executeClipboardCopy(reflectionsText, 'Reflections copied to clipboard!');
+            }
+
+            copyReportToClipboard() {
+                sounds.playClick();
+                const name = document.getElementById('rpt-name')?.innerText || '';
+                const course = document.getElementById('rpt-course')?.innerText || '';
+                const date = document.getElementById('rpt-date')?.innerText || '';
+                const topTrigs = this.topTriggers.map(t => `${t.label} (${t.score}/5)`).join(', ');
+                const tools = this.selectedTechniques.map(tId => TECHNIQUES_DATA.find(t => t.id === tId)?.title).join(', ');
+                
+                const q1 = document.getElementById('reflect-q1')?.value || '';
+                const q2 = document.getElementById('reflect-q2')?.value || '';
+                const q3 = document.getElementById('reflect-q3')?.value || '';
+
+                const textToCopy = `ACTION PLAN & REFLECTION
+==================================================
+Student: ${name}
+Course / Project: ${course}
+Date: ${date}
+
+DIAGNOSTIC SUMMARY:
+${topTrigs || 'None'}
+
+SELECTED TECHNIQUES:
+${tools || 'None'}
+
+STUDENT REFLECTIONS:
+1. Priority Rocks vs. Sand Distractions:
+${q1 || 'N/A'}
+
+2. Delayed Tasks & Reasons:
+${q2 || 'N/A'}
+
+3. Application of Selected Techniques:
+${q3 || 'N/A'}
+`;
+
+                this.executeClipboardCopy(textToCopy, 'Action Plan & Reflections copied!');
+            }
+
+            executeClipboardCopy(text, successMsg) {
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = text;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempTextArea);
+                this.showToast(successMsg, 'fa-copy');
+            }
+
+            nextModule(curr) {
+                sounds.playClick();
+                this.goToModule(curr + 1);
+            }
+
+            resetGame() {
+                sounds.playClick();
+                this.diagnosticRatings = {};
+                this.topTriggers = [];
+                this.triggerScore = 0;
+                this.scenarioCompleted = [false, false, false, false];
+                this.assignedTasks = {};
+                this.selectedTechniques = [];
+                this.expandedTechniques.clear();
+                this.goToModule(0);
+            }
+
+            showToast(msg, iconClass = 'fa-circle-check') {
+                const toast = document.getElementById('toast-notification');
+                const toastMsg = document.getElementById('toast-message');
+                const toastIcon = document.getElementById('toast-icon');
+
+                if (toast && toastMsg && toastIcon) {
+                    toastMsg.innerText = msg;
+                    toastIcon.className = `fa-solid ${iconClass}`;
+
+                    toast.classList.remove('translate-y-20', 'opacity-0');
+                    setTimeout(() => {
+                        toast.classList.add('translate-y-20', 'opacity-0');
+                    }, 2800);
+                }
+            }
+        }
+
+        // Attach instance globally on window load
+        var app;
+        window.onload = function() {
+            app = new TimeManagementApp();
+            window.app = app;
+            app.init();
+        };
+    </script>
+</body>
+</html>
