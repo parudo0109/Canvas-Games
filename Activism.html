@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food Labeling Issue Management Simulation</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            org: '#2563eb',       // Blue
+            activist: '#059669',  // Emerald
+            gov: '#d97706',       // Amber
+            media: '#9333ea'      // Purple
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(51, 65, 85, 0.8);
+      border-radius: 4px;
+    }
+    .drop-target-active {
+      border-color: #3b82f6 !important;
+      background-color: rgba(59, 130, 246, 0.1) !important;
+    }
+    .drag-item {
+      cursor: grab;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    .drag-item:active {
+      cursor: grabbing;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col overflow-x-hidden custom-scrollbar bg-slate-950 text-slate-100 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-slate-900/90 border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md px-4 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="p-2.5 bg-gradient-to-tr from-blue-600 to-emerald-600 rounded-xl shadow-lg text-white">
+        <i data-lucide="layers" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <h1 class="text-base lg:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+          Issue Management & Strategy Alignment Simulation
+          <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">Food Transparency</span>
+        </h1>
+        <p class="text-xs text-slate-400">Match Stance & Response Strategy for each stakeholder group</p>
+      </div>
+    </div>
+
+    <!-- Stakeholder Group Selector in Header -->
+    <div id="stakeholder-tabs" class="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-1 sm:pb-0">
+      <!-- Generated via JS -->
+    </div>
+  </header>
+
+  <!-- Main Workbench Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 flex flex-col gap-5">
+
+    <!-- Scenario Presentation Banner -->
+    <section class="bg-gradient-to-r from-slate-900 via-blue-950/40 to-slate-900 border border-blue-500/30 rounded-2xl p-5 shadow-xl relative overflow-hidden">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div class="space-y-1.5 max-w-3xl">
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-md bg-blue-500/20 text-blue-400 font-bold text-[10px] uppercase tracking-wider border border-blue-500/30">
+              Issue Scenario
+            </span>
+            <span class="text-xs font-semibold text-slate-400">Context: Vietnam Food Sector</span>
+          </div>
+          <h2 class="text-base md:text-lg font-bold text-white flex items-center gap-2">
+            <i data-lucide="file-text" class="w-5 h-5 text-blue-400"></i>
+            Mandatory Transparent Food Labeling Policy
+          </h2>
+          <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
+            The national debate centers on whether packaged food products must feature mandatory, standardized front-of-pack nutritional labels (such as traffic-light warnings for sugar, salt, and fat) to help consumers make informed, healthy decisions.
+          </p>
+        </div>
+        <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800 text-xs text-slate-400 space-y-1 shrink-0 w-full md:w-auto">
+          <span class="font-bold text-white flex items-center gap-1">
+            <i data-lucide="target" class="w-3.5 h-3.5 text-amber-400"></i> Learning Objective:
+          </span>
+          <p class="text-[11px] text-slate-300 max-w-xs">
+            Identify how your assigned stakeholder's position translates into high-level response strategy.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Notification / Info Message Box -->
+    <div id="msg-box" class="hidden p-4 rounded-xl border bg-amber-500/10 border-amber-500/30 text-amber-300 text-xs flex items-center justify-between gap-3 shadow-md">
+      <div class="flex items-center gap-2">
+        <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
+        <span id="msg-text">Notification message...</span>
+      </div>
+      <button onclick="dismissMsg()" class="text-amber-400 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+    </div>
+
+    <!-- STEP 1: ROLE SELECTION SCREEN (Appears first before role details are presented) -->
+    <section id="role-selection-screen" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5">
+      <div class="text-center max-w-2xl mx-auto space-y-2">
+        <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xs uppercase tracking-wider border border-blue-500/30 inline-flex items-center gap-1.5">
+          <i data-lucide="users" class="w-3.5 h-3.5"></i> Step 1: Role Assignment
+        </span>
+        <h2 class="text-xl md:text-2xl font-bold text-white">Select Your Assigned Stakeholder Role</h2>
+        <p class="text-xs md:text-sm text-slate-400">
+          Choose the group you represent in this issue simulation. Once selected, your group's primary pursuit, strategy options, and workbench will be revealed.
+        </p>
+      </div>
+
+      <div id="role-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- STEP 2: STAKEHOLDER ROLE OVERVIEW BANNER (Hidden until role is selected) -->
+    <section id="role-banner" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <!-- Generated dynamically by JS -->
+    </section>
+
+    <!-- STEP 3: INTERACTIVE WORKBENCH (Hidden until role is selected) -->
+    <section id="workbench-section" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- LEFT COLUMN: TARGET SLOTS (WHERE STUDENTS DROP ITEMS) -->
+      <div class="lg:col-span-5 space-y-4 flex flex-col">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+          <h2 class="text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
+            <i data-lucide="target" class="w-4 h-4 text-blue-400"></i> Selected Strategy Profile
+          </h2>
+          <div class="flex items-center gap-3">
+            <button onclick="showRoleSelectionScreen()" class="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 font-semibold transition-colors">
+              <i data-lucide="user-check" class="w-3.5 h-3.5"></i> Change Role
+            </button>
+            <button onclick="clearAllSlots()" class="text-xs text-slate-400 hover:text-rose-400 flex items-center gap-1 transition-colors">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Clear Slots
+            </button>
+          </div>
+        </div>
+
+        <!-- SLOT 1: STANCE -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-2">
+          <div class="flex items-center justify-between text-xs font-bold text-amber-400">
+            <span class="flex items-center gap-1.5"><span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-[10px]">1</span> STANCE SLOT</span>
+            <span class="text-[10px] text-slate-500 font-normal">Drop or select Stance card</span>
+          </div>
+          <div id="slot-stance" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'stance')" class="min-h-[70px] p-3 rounded-xl border-2 border-dashed border-slate-800 bg-slate-950/60 flex items-center justify-center transition-all">
+            <span class="text-xs text-slate-500 italic pointer-events-none text-center">Drag a Stance option here or click "Select"</span>
+          </div>
+        </div>
+
+        <!-- SLOT 2: RESPONSE STRATEGY -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-2">
+          <div class="flex items-center justify-between text-xs font-bold text-blue-400">
+            <span class="flex items-center gap-1.5"><span class="w-5 h-5 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-[10px]">2</span> STRATEGIC RESPONSE SLOT</span>
+            <span class="text-[10px] text-slate-500 font-normal">Drop or select Response card</span>
+          </div>
+          <div id="slot-response" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'response')" class="min-h-[70px] p-3 rounded-xl border-2 border-dashed border-slate-800 bg-slate-950/60 flex items-center justify-center transition-all">
+            <span class="text-xs text-slate-500 italic pointer-events-none text-center">Drag a Response Strategy card here or click "Select"</span>
+          </div>
+        </div>
+
+        <!-- SLOT 3: SPECIFIC ACTION -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-2">
+          <div class="flex items-center justify-between text-xs font-bold text-emerald-400">
+            <span class="flex items-center gap-1.5"><span class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px]">3</span> SPECIFIC ACTION SLOT</span>
+            <span class="text-[10px] text-slate-500 font-normal">Drop or select Action card</span>
+          </div>
+          <div id="slot-action" ondragover="allowDrop(event)" ondrop="handleDrop(event, 'action')" class="min-h-[70px] p-3 rounded-xl border-2 border-dashed border-slate-800 bg-slate-950/60 flex items-center justify-center transition-all">
+            <span class="text-xs text-slate-500 italic pointer-events-none text-center">Drag a Specific Action card here or click "Select"</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: OPTIONS BANKS (CARDS TO DRAG OR SELECT) -->
+      <div class="lg:col-span-7 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+          <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 flex items-center gap-2">
+            <i data-lucide="layout-grid" class="w-4 h-4 text-emerald-400"></i> Available Choice Bank
+          </h2>
+          <span class="text-xs text-slate-400">Drag items to slots or click <strong class="text-blue-400">"Select"</strong></span>
+        </div>
+
+        <!-- OPTIONS TABS (Stances, Responses, Actions) -->
+        <div class="flex border-b border-slate-800 gap-2 overflow-x-auto">
+          <button onclick="switchOptionTab('stances')" id="opt-tab-stances" class="px-3 py-2 text-xs font-bold rounded-t-xl border-b-2 border-amber-500 bg-slate-900 text-amber-400 flex items-center gap-1.5 transition-all shrink-0">
+            <i data-lucide="scale" class="w-3.5 h-3.5"></i> Stances
+          </button>
+          <button onclick="switchOptionTab('responses')" id="opt-tab-responses" class="px-3 py-2 text-xs font-bold rounded-t-xl border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-1.5 transition-all shrink-0">
+            <i data-lucide="shield" class="w-3.5 h-3.5"></i> Strategic Responses
+          </button>
+          <button onclick="switchOptionTab('actions')" id="opt-tab-actions" class="px-3 py-2 text-xs font-bold rounded-t-xl border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-1.5 transition-all shrink-0">
+            <i data-lucide="zap" class="w-3.5 h-3.5"></i> Specific Actions
+          </button>
+        </div>
+
+        <!-- CARDS CONTAINER -->
+        <div id="options-cards-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[500px] overflow-y-auto custom-scrollbar p-1">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    // Stakeholder Data Models & Bank of Choices (Adapted for Vietnam context)
+    const STAKEHOLDERS = [
+      {
+        id: 'org',
+        name: 'ABC Food Corp',
+        entity: 'ABC Food Corporation / FMCG Manufacturer',
+        color: 'blue',
+        textClass: 'text-blue-400',
+        bgClass: 'bg-blue-500/10',
+        borderClass: 'border-blue-500/40',
+        icon: 'building-2',
+        pursuit: 'Protect trade secret formulas, maintain commercial freedom, and advocate for voluntary digital disclosures (e.g. QR codes) rather than costly mandatory package redesigns.'
+      },
+      {
+        id: 'activist',
+        name: 'Consumer Rights Association',
+        entity: 'Vietnam Consumer Protection Coalition',
+        color: 'emerald',
+        textClass: 'text-emerald-400',
+        bgClass: 'bg-emerald-500/10',
+        borderClass: 'border-emerald-500/40',
+        icon: 'megaphone',
+        pursuit: 'Demand mandatory front-of-pack traffic-light warning labels, full ingredient transparency, and public corporate accountability to safeguard public health.'
+      },
+      {
+        id: 'gov',
+        name: 'Vietnam Food Safety Administration (VFSA)',
+        entity: 'Ministry of Health / Regulatory Body',
+        color: 'amber',
+        textClass: 'text-amber-400',
+        bgClass: 'bg-amber-500/10',
+        borderClass: 'border-amber-500/40',
+        icon: 'landmark',
+        pursuit: 'Protect public health, lower chronic disease burdens, establish enforceable regulatory standards, and ensure fair competition among food manufacturers.'
+      },
+      {
+        id: 'media',
+        name: 'Media & Press',
+        entity: 'National Press Network & Digital Media',
+        color: 'purple',
+        textClass: 'text-purple-400',
+        bgClass: 'bg-purple-500/10',
+        borderClass: 'border-purple-500/40',
+        icon: 'newspaper',
+        pursuit: 'Expose corporate lobbying influence, highlight public health risks, increase consumer awareness, and present objective multi-angle reporting.'
+      }
+    ];
+
+    // Master Item Banks
+    const BANK_STANCES = [
+      { id: 'st_oppose', text: 'Oppose Mandatory Labels', desc: 'Resists compulsory front-of-pack warning labels; advocates for voluntary disclosures or existing packaging standards.', validGroups: ['org'] },
+      { id: 'st_support', text: 'Support Mandatory Labels', desc: 'Demands mandatory, standardized front-of-pack nutritional warnings and complete ingredient transparency.', validGroups: ['activist'] },
+      { id: 'st_hybrid', text: 'Hybrid / Conditional Implementation', desc: 'Supports transparent labeling subject to phased rollouts, flexible criteria, or balanced multi-perspective reporting.', validGroups: ['gov', 'media'] }
+    ];
+
+    const BANK_RESPONSES = [
+      // ABC Food Corp Responses
+      { id: 'resp_limited_engagement', type: 'response', title: 'Limited Public Engagement', desc: 'Refusing active public statements to minimize issue visibility.', group: 'org' },
+      { id: 'resp_positive_initiatives', type: 'response', title: 'Highlighting Positive Initiatives', desc: 'Emphasizing corporate social responsibility and voluntary nutritional commitments.', group: 'org' },
+      { id: 'resp_info_reframing', type: 'response', title: 'Information Reframing & Research', desc: 'Promoting independent scientific studies that emphasize balanced diet and consumer choice.', group: 'org' },
+      { id: 'resp_legal_opposition', type: 'response', title: 'Legal & Regulatory Opposition', desc: 'Formally challenging regulatory authority and petitioning administrative bodies.', group: 'org' },
+
+      // Consumer Rights Association Responses
+      { id: 'resp_brand_campaigns', type: 'response', title: 'Public Brand Campaigns', desc: 'Exposing non-compliant food brands through public campaigns and social media pressure.', group: 'activist' },
+      { id: 'resp_boycott_mobilization', type: 'response', title: 'Consumer Mobilization', desc: 'Organizing consumer purchasing decisions to reward transparent brands and boycott non-disclosing ones.', group: 'activist' },
+      { id: 'resp_strategic_litigation', type: 'response', title: 'Strategic Consumer Petitions', desc: 'Filing administrative complaints against deceptive advertising and misleading health claims.', group: 'activist' },
+
+      // Vietnam Food Safety Administration (VFSA) Responses
+      { id: 'resp_committee_review', type: 'response', title: 'Committee Review & Technical Study', desc: 'Referring proposals to expert advisory panels for extended technical evaluation.', group: 'gov' },
+      { id: 'resp_rulemaking_consult', type: 'response', title: 'Notice-and-Comment Consultations', desc: 'Holding formal public consultations to gather stakeholder evidence before finalizing standards.', group: 'gov' },
+      { id: 'resp_visual_mandate', type: 'response', title: 'Standardized Visual Warning Mandate', desc: 'Establishing uniform visual warning icons for high-sugar, high-sodium packaged foods.', group: 'gov' },
+
+      // Media & Press Responses
+      { id: 'resp_high_impact_framing', type: 'response', title: 'High-Impact Risk Framing', desc: 'Focusing coverage on public health risks, nutritional impacts, and consumer awareness stories.', group: 'media' },
+      { id: 'resp_investigative_expose', type: 'response', title: 'Investigative Lobbying Expose', desc: 'Publishing deep-dive investigative reports examining corporate policy influence and lobby efforts.', group: 'media' },
+      { id: 'resp_balanced_reporting', type: 'response', title: 'Multi-Perspective Reporting', desc: 'Presenting contrasting viewpoints from food manufacturers, health experts, and consumer groups.', group: 'media' }
+    ];
+
+    const BANK_ACTIONS = [
+      // ABC Food Corp Actions
+      { id: 'act_qr_migration', type: 'action', title: 'QR Code Packaging Migration', desc: 'Transitioning ingredient transparency to digital QR codes printed on back of packs rather than front labels.', group: 'org' },
+      { id: 'act_wellness_partnership', type: 'action', title: 'Voluntary Wellness Partnerships', desc: 'Sponsoring community youth sports and nutritional education programs in local schools.', group: 'org' },
+      { id: 'act_whitepaper_release', type: 'action', title: 'Scientific Whitepaper Release', desc: 'Commissioning independent food science reports emphasizing total dietary balance.', group: 'org' },
+      { id: 'act_admin_appeal', type: 'action', title: 'Administrative Policy Objections', desc: 'Submitting formal legal appeals arguing mandatory front warnings infringe trade dress protections.', group: 'org' },
+
+      // Consumer Rights Association Actions
+      { id: 'act_social_infographics', type: 'action', title: 'Social Media Contrast Graphics', desc: 'Publishing side-by-side product comparisons exposing high sugar content in popular packaged foods.', group: 'activist' },
+      { id: 'act_pledge_drive', type: 'action', title: 'Supermarket Purchasing Pledge', desc: 'Mobilizing shoppers to sign petitions prioritizing food brands with clear nutritional disclosures.', group: 'activist' },
+      { id: 'act_formal_complaint', type: 'action', title: 'Regulatory Complaint Filing', desc: 'Filing formal petitions demanding mandatory traffic-light symbols on high-sodium food packages.', group: 'activist' },
+
+      // VFSA Actions
+      { id: 'act_panel_formation', type: 'action', title: 'Expert Advisory Panel Review', desc: 'Convening a technical panel of medical officers, nutritionists, and industry representatives.', group: 'gov' },
+      { id: 'act_public_hearings', type: 'action', title: 'Stakeholder Public Forum', desc: 'Hosting scheduled public feedback sessions to collect evidence from consumers and producers.', group: 'gov' },
+      { id: 'act_circular_drafting', type: 'action', title: 'Drafting National Label Directive', desc: 'Publishing draft technical regulations mandating standardized front-of-pack warning icons.', group: 'gov' },
+
+      // Media Actions
+      { id: 'act_prime_time_series', type: 'action', title: 'Prime-Time Public Health Broadcast', desc: 'Airing a multi-part documentary on dietary health risks and front-of-pack label effectiveness.', group: 'media' },
+      { id: 'act_lobby_investigation', type: 'action', title: 'Corporate Influence Expose', desc: 'Investigating corporate lobbying efforts aimed at delaying transparent labeling legislation.', group: 'media' },
+      { id: 'act_live_debate_forum', type: 'action', title: 'Live Stakeholder Panel Debate', desc: 'Hosting a televised debate featuring VFSA officials, FMCG executives, and health advocates.', group: 'media' }
+    ];
+
+    // State Management (Initially null activeGroupId to force role selection)
+    let state = {
+      activeGroupId: null,
+      activeOptionTab: 'stances', // 'stances', 'responses', 'actions'
+      selectedSlots: {
+        stance: null,   // item object
+        response: null, // item object
+        action: null    // item object
+      }
+    };
+
+    // Initialize Game
+    window.addEventListener('load', () => {
+      renderRoleSelectionCards();
+      renderStakeholderTabs();
+      if (window.lucide) lucide.createIcons();
+    });
+
+    // Render Initial Role Selection Cards (Step 1)
+    function renderRoleSelectionCards() {
+      const container = document.getElementById('role-cards-grid');
+      container.innerHTML = STAKEHOLDERS.map(g => {
+        return `
+          <div onclick="selectRole('${g.id}')" class="p-5 rounded-2xl border ${g.borderClass} ${g.bgClass} hover:border-blue-400 hover:scale-[1.02] cursor-pointer transition-all flex flex-col justify-between space-y-4 group shadow-lg">
+            <div class="space-y-3">
+              <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-700/60 w-fit ${g.textClass} group-hover:scale-110 transition-transform">
+                <i data-lucide="${g.icon}" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider ${g.textClass}">${g.entity}</span>
+                <h3 class="text-lg font-bold text-white group-hover:text-blue-300 transition-colors">${g.name}</h3>
+              </div>
+            </div>
+            <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs font-semibold ${g.textClass}">
+              <span>Select Role</span>
+              <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // Select Role & Reveal Role Details & Workbench
+    function selectRole(groupId) {
+      state.activeGroupId = groupId;
+      clearAllSlots();
+
+      // UI Transition: Hide initial selection screen, reveal role banner & workbench
+      document.getElementById('role-selection-screen').classList.add('hidden');
+      document.getElementById('role-banner').classList.remove('hidden');
+      document.getElementById('workbench-section').classList.remove('hidden');
+
+      renderStakeholderTabs();
+      renderRoleBanner();
+      renderOptionCards();
+      dismissMsg();
+    }
+
+    // Return to Role Selection Screen
+    function showRoleSelectionScreen() {
+      document.getElementById('role-selection-screen').classList.remove('hidden');
+      document.getElementById('role-banner').classList.add('hidden');
+      document.getElementById('workbench-section').classList.add('hidden');
+      state.activeGroupId = null;
+      renderStakeholderTabs();
+    }
+
+    // Render Stakeholder Group Tabs in Header
+    function renderStakeholderTabs() {
+      const container = document.getElementById('stakeholder-tabs');
+      if (!state.activeGroupId) {
+        container.innerHTML = `<span class="text-xs text-amber-400 font-semibold flex items-center gap-1"><i data-lucide="user-check" class="w-3.5 h-3.5"></i> Select a role below to start</span>`;
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = STAKEHOLDERS.map(g => {
+        const isActive = g.id === state.activeGroupId;
+        return `
+          <button onclick="selectRole('${g.id}')" class="flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs transition-all whitespace-nowrap ${isActive ? 'bg-slate-800 border-slate-600 text-white font-bold shadow-lg' : 'bg-slate-950/60 border-slate-800/80 text-slate-400 hover:text-slate-200'}">
+            <span class="w-5 h-5 rounded-full ${g.bgClass} ${g.textClass} flex items-center justify-center font-bold text-[10px] border border-slate-700">
+              <i data-lucide="${g.icon}" class="w-3 h-3"></i>
+            </span>
+            <span>${g.name}</span>
+          </button>
+        `;
+      }).join('');
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // Render Role Banner Context
+    function renderRoleBanner() {
+      if (!state.activeGroupId) return;
+      const g = STAKEHOLDERS.find(s => s.id === state.activeGroupId);
+      const container = document.getElementById('role-banner');
+      container.innerHTML = `
+        <div class="flex items-center gap-3">
+          <div class="p-3.5 rounded-2xl ${g.bgClass} ${g.textClass} border ${g.borderClass} shrink-0">
+            <i data-lucide="${g.icon}" class="w-7 h-7"></i>
+          </div>
+          <div>
+            <div class="text-[10px] font-bold uppercase tracking-wider ${g.textClass}">Active Stakeholder Focus</div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">${g.name}</h2>
+            <p class="text-xs text-slate-400">${g.entity}</p>
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 space-y-1 max-w-2xl text-xs w-full md:w-auto">
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Primary Group Pursuit & Goals:</span>
+          <p class="text-slate-300 leading-relaxed text-xs">${g.pursuit}</p>
+        </div>
+      `;
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // Switch Option Category Tab
+    function switchOptionTab(tabKey) {
+      state.activeOptionTab = tabKey;
+      ['stances', 'responses', 'actions'].forEach(t => {
+        const btn = document.getElementById(`opt-tab-${t}`);
+        if (t === tabKey) {
+          btn.className = 'px-3 py-2 text-xs font-bold rounded-t-xl border-b-2 border-blue-500 bg-slate-900 text-blue-400 flex items-center gap-1.5 transition-all shrink-0';
+        } else {
+          btn.className = 'px-3 py-2 text-xs font-bold rounded-t-xl border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-1.5 transition-all shrink-0';
+        }
+      });
+      renderOptionCards();
+    }
+
+    // Render Available Choice Cards in Right Column
+    function renderOptionCards() {
+      if (!state.activeGroupId) return;
+      const container = document.getElementById('options-cards-container');
+      let items = [];
+
+      if (state.activeOptionTab === 'stances') {
+        items = BANK_STANCES.map(item => ({ ...item, category: 'stance' }));
+      } else if (state.activeOptionTab === 'responses') {
+        items = BANK_RESPONSES.map(item => ({ ...item, category: 'response' }));
+      } else {
+        items = BANK_ACTIONS.map(item => ({ ...item, category: 'action' }));
+      }
+
+      container.innerHTML = items.map(item => {
+        const isPlaced = state.selectedSlots[item.category] && state.selectedSlots[item.category].id === item.id;
+
+        return `
+          <div draggable="true" ondragstart="handleDragStart(event, '${item.category}', '${item.id}')" class="drag-item p-3.5 rounded-xl border bg-slate-950 transition-all flex flex-col justify-between space-y-2.5 ${isPlaced ? 'border-blue-500 bg-blue-500/10 opacity-70' : 'border-slate-800 hover:border-slate-700 hover:bg-slate-900'}">
+            <div class="space-y-1">
+              <div class="flex items-center justify-between text-[10px]">
+                <span class="px-2 py-0.5 rounded font-bold uppercase bg-slate-800 text-slate-300 border border-slate-700">${item.category.toUpperCase()} OPTION</span>
+              </div>
+              <h4 class="text-xs font-bold text-white">${item.text || item.title}</h4>
+              <p class="text-[11px] text-slate-400 leading-relaxed">${item.desc}</p>
+            </div>
+
+            <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-2">
+              <span class="text-[10px] text-slate-500 italic">Drag card to target slot</span>
+              <button type="button" onclick="placeItemDirectly('${item.category}', '${item.id}')" class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-blue-600 hover:bg-blue-500 text-white flex items-center gap-1 transition-all">
+                <i data-lucide="${isPlaced ? 'check' : 'plus'}" class="w-3 h-3"></i> ${isPlaced ? 'Placed' : 'Select'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // Drag and Drop Handlers
+    function handleDragStart(e, category, itemId) {
+      e.dataTransfer.setData('category', category);
+      e.dataTransfer.setData('itemId', itemId);
+    }
+
+    function allowDrop(e) {
+      e.preventDefault();
+      e.currentTarget.classList.add('drop-target-active');
+    }
+
+    function handleDrop(e, targetSlotCategory) {
+      e.preventDefault();
+      e.currentTarget.classList.remove('drop-target-active');
+
+      const itemCategory = e.dataTransfer.getData('category');
+      const itemId = e.dataTransfer.getData('itemId');
+
+      if (itemCategory !== targetSlotCategory) {
+        showMsg(`Please drop a ${targetSlotCategory.toUpperCase()} card into the ${targetSlotCategory.toUpperCase()} slot.`);
+        return;
+      }
+
+      placeItemDirectly(itemCategory, itemId);
+    }
+
+    function placeItemDirectly(category, itemId) {
+      let foundItem = null;
+      if (category === 'stance') foundItem = BANK_STANCES.find(i => i.id === itemId);
+      else if (category === 'response') foundItem = BANK_RESPONSES.find(i => i.id === itemId);
+      else if (category === 'action') foundItem = BANK_ACTIONS.find(i => i.id === itemId);
+
+      if (foundItem) {
+        state.selectedSlots[category] = { ...foundItem, category };
+        renderSlotTargets();
+        renderOptionCards();
+        dismissMsg();
+      }
+    }
+
+    // Render Slots UI Target Display
+    function renderSlotTargets() {
+      ['stance', 'response', 'action'].forEach(cat => {
+        const container = document.getElementById(`slot-${cat}`);
+        const item = state.selectedSlots[cat];
+
+        if (item) {
+          container.innerHTML = `
+            <div class="w-full flex items-center justify-between gap-2 p-1">
+              <div class="text-left space-y-0.5">
+                <span class="text-xs font-bold text-white block">${item.text || item.title}</span>
+                <span class="text-[11px] text-slate-400 block">${item.desc}</span>
+              </div>
+              <button onclick="removeSlotItem('${cat}')" class="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 shrink-0 transition-colors">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+          `;
+        } else {
+          container.innerHTML = `<span class="text-xs text-slate-500 italic pointer-events-none text-center">Drag a ${cat.toUpperCase()} option here or click "Select"</span>`;
+        }
+      });
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function removeSlotItem(category) {
+      state.selectedSlots[category] = null;
+      renderSlotTargets();
+      renderOptionCards();
+    }
+
+    function clearAllSlots() {
+      state.selectedSlots = { stance: null, response: null, action: null };
+      renderSlotTargets();
+      renderOptionCards();
+    }
+
+    // Helpers
+    function showMsg(text) {
+      document.getElementById('msg-text').textContent = text;
+      document.getElementById('msg-box').classList.remove('hidden');
+    }
+
+    function dismissMsg() {
+      document.getElementById('msg-box').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
